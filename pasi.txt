@@ -1,0 +1,2 @@
+python3 -m pip install requests  // se instaleaza in consola
+python3 main.py url "https://www.datacamp.com/community/tutorials/making-http-requests-in-python" 2 // comanda pentru verificare url cu timp
