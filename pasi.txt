@@ -1,2 +1,11 @@
 python3 -m pip install requests  // se instaleaza in consola
+python3 -m pip install ftplib
+python3 -m pip install pymongo
+pip3 install pymongo[srv]
+pip3 install psycopg2
+
+
+postgres localhost Marius 123 5432 postgres (pgAdmin4)
+ftp localhost Marius 123 (FileServer)
+mongo "mongodb+srv://Marius:123@cluster0.cbmab.mongodb.net/<dbname>?retryWrites=true&w=majority" (MongoWebServer)
 python3 main.py url "https://www.datacamp.com/community/tutorials/making-http-requests-in-python" 2 // comanda pentru verificare url cu timp
