@@ -1,19 +1,11 @@
-from ftplib import FTP
-import keyboard
-import sys
-import requests as requests
-import time
-import signal
-from msvcrt import getch
-import msvcrt
-import pymongo
-import psycopg2
+from imports import *
+
 
 def helper():
-    welcome=" Bun venit!\n"
-    name=" Eu sunt CheckTool! Sunt un utilitar deci comenzile o sa le scrii tu...\n\n"
-    details="      Ai mai multe variante:\n"
-    print(welcome.center(50," "))
+    welcome = " Bun venit!\n"
+    name = " Eu sunt CheckTool! Sunt un utilitar deci comenzile o sa le scrii tu...\n\n"
+    details = "      Ai mai multe variante:\n"
+    print(welcome.center(50, " "))
     print(name)
     print(details)
     print("1. a. utility.py urlOne <link-ul> (verificare OneTime)\n")
@@ -23,26 +15,36 @@ def helper():
     print("3. a. utility.py mongoOne <server> (verificareOneTime)\n")
     print("   b. utility.py mongo <server> <numar> <unitate timp> (verificare la durata precizata)\n\n")
     print("4. a. utility.py postgreOne <host> <user> <password> <port> <database> (verificareOneTime)\n")
-    print("   b. utility.py postgreOne <host> <user> <password> <port> <database> <numar> <unitate timp> (verificare la durata precizata)\n\n")
+    print(
+        "   b. utility.py postgre <host> <user> <password> <port> <database> <numar> <unitate timp> "
+        "(verificare la durata precizata)\n\n")
+    print("5. a. utility.py elastic <host> <user> <password> (verificareOneTime)\n")
+    print(
+        "   b. utility.py elastic <host> <user> <password> <numar> <unitate timo> (verificare la durata precizata)\n\n")
     print(" Numar = este numarul de secunde, ore, minute, zile, etc.")
     print(" Unitati de timp: Sec , Min , Hours , Days , Months ")
     print(" Ex: <numar> <unitate timp> ---> 4 Hours")
 
-#URL
+
+# URL
 def checkUrl(urlString):
     try:
         r = requests.get(urlString)
-        if(r.status_code>199 and r.status_code<300):
-         print("Este valid!")
+        if 199 < r.status_code < 300:
+            valid = "Este valid!"
+            print(valid.center(50, " "))
         else:
-         print("Invalid!")
-    except:
-        print("Eroare,incearca un link!")
+            invalid = "Este invalid!"
+            print(invalid.center(50, " "))
+    except ConnectionError as errorUrl:
+        print(errorUrl)
+        print("Eroare,link invalid!")
+
 
 def url(urlString, timeNumber, timeLetters):
     print(urlString)
     sec = timer(int(timeNumber), timeLetters)
-    if (sec == None):
+    if sec is None:
         print("Scrie un timp corect!")
         return 0
     checkUrl(urlString)
@@ -57,35 +59,40 @@ def url(urlString, timeNumber, timeLetters):
                 return 0
         time.sleep(1)
         sec -= 1
-    if (sec == 0):
+    if sec == 0:
         ver = stopCicle()
-        if (ver == 0):
-            print("CheckTool a fost oprit!")
+        if ver == 0:
+            print("\n\nCheckTool a fost oprit!")
         else:
-            print("CheckTool va incerca peste timpul stabilit inca o conectare!\n\n")
+            print("\n\nCheckTool va incerca peste timpul stabilit inca o conectare!\n\n")
             url(urlString, timeNumber, timeLetters)
+
 
 def urlOne(urlString):
     print(urlString)
     checkUrl(urlString)
 
 
-#FTP
-def checkFtp(stringFtp,stringUser,stringPassword):
-  try:
-    ftpObj = FTP(stringFtp,stringUser,stringPassword)
-    if (ftpObj.getwelcome() != None):
-        print("Conectarea la server se poate realiza!")
-  except:
-    print("Eroare la conectare! Serverul nu este valid!")
+# FTP
+def checkFtp(stringFtp, stringUser, stringPassword):
+    try:
+        ftpObj = FTP(stringFtp, stringUser, stringPassword)
+        if ftpObj.getwelcome() is not None:
+            valid = "Conectarea la server se poate realiza!"
+            print(valid.center(50, " "))
 
-def ftp(ftpString,user,password, timeFtpNumber, timeFtpLetters):
-    print("Nume Host:",ftpString)
+    except ConnectionError as errorFtp:
+        print(errorFtp)
+        print("Eroare la conectare! Serverul nu este valid!")
+
+
+def ftp(ftpString, user, password, timeFtpNumber, timeFtpLetters):
+    print("Nume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
     secFtp = timer(int(timeFtpNumber), timeFtpLetters)
-    if (secFtp == None):
+    if secFtp is None:
         print("Scrie un timp corect!")
         return 0
-    checkFtp(ftpString,user,password)
+    checkFtp(ftpString, user, password)
     print("Apasa orice tasta pentru a opri programul...")
     while secFtp:
         print("Timp ramas: ", secFtp, " secunde", end="\r")
@@ -95,40 +102,44 @@ def ftp(ftpString,user,password, timeFtpNumber, timeFtpLetters):
                 return 0
         time.sleep(1)
         secFtp -= 1
-    if (secFtp == 0):
+    if secFtp == 0:
         ver = stopCicle()
-        if (ver == 0):
-                print("CheckToolFtp a fost oprit!")
+        if ver == 0:
+            print("\n\nCheckToolFtp a fost oprit!")
         else:
-                print("CheckToolFtp va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
-                ftp(ftpString,user,password,timeFtpNumber,timeFtpLetters)
+            print("\n\nCheckToolFtp va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
+            ftp(ftpString, user, password, timeFtpNumber, timeFtpLetters)
 
-def ftpOne(ftpString,user,password):
-    print("Nume Host:", ftpString)
+
+def ftpOne(ftpString, user, password):
+    print("Nume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
     checkFtp(ftpString, user, password)
 
 
-#MongoDB
+# MongoDB
 def checkMongo(stringMongo):
     try:
         client = pymongo.MongoClient(stringMongo)
         db = client.admin
         info = client.server_info()
         serverStatusResult = db.command("serverStatus")
-        if (info != None and serverStatusResult != None):
-            print("Conexiunea este valida!")
+        if info is not None and serverStatusResult is not None:
+            valid = "Conexiune valida!"
+            print(valid.center(50, " "))
         client.close()
-    except:
+    except ConnectionError as errorMongo:
+        print(errorMongo)
         print("Serverul nu este valid!")
 
-def mongo(stringMongo,timeMongoNumber,timeMongoLetters):
+
+def mongo(stringMongo, timeMongoNumber, timeMongoLetters):
     print("Nume Mongo:", stringMongo)
     secMongo = timer(int(timeMongoNumber), timeMongoLetters)
-    if (secMongo == None):
+    if secMongo is None:
         print("Scrie un timp corect!")
         return 0
     checkMongo(stringMongo)
-    print("Apasa orice tasta pentru a opri programul...")
+    print("Apasa orice tasta pentru a opri programul...\n")
     while secMongo:
         print("Timp ramas: ", secMongo, " secunde", end="\r")
         if msvcrt.kbhit():
@@ -137,35 +148,41 @@ def mongo(stringMongo,timeMongoNumber,timeMongoLetters):
                 return 0
         time.sleep(1)
         secMongo -= 1
-    if (secMongo == 0):
+    if secMongo == 0:
         ver = stopCicle()
-        if (ver == 0):
-            print("CheckToolMongo a fost oprit!")
+        if ver == 0:
+            print("\n\nCheckToolMongo a fost oprit!")
         else:
-            print("CheckToolMongo va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
-            mongo(stringMongo,timeMongoNumber,timeMongoLetters)
+            print("\n\nCheckToolMongo va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
+            mongo(stringMongo, timeMongoNumber, timeMongoLetters)
+
 
 def mongoOne(stringMongo):
-  print("Nume Mongo:",stringMongo)
-  checkMongo(stringMongo)
+    print("Nume Mongo:", stringMongo)
+    checkMongo(stringMongo)
 
 
-#PostgreSql
-def checkPostgre(stringHost,stringUser,stringPass,stringPort,stringDB):
+# PostgreSql
+def checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB):
     try:
-        conn = "host=" + stringHost + " dbname=" + stringDB + " user=" + stringUser + " password=" + stringPass + " port=" + stringPort
+        conn = "host=" + stringHost \
+               + " dbname=" + stringDB \
+               + " user=" + stringUser \
+               + " password=" + stringPass \
+               + " port=" + stringPort
         connection = psycopg2.connect(conn)
-        print("Conexiune valida!")
+        valid = "Conexiune valida!"
+        print(valid.center(50, " "))
         connection.close()
-    except psycopg2.OperationalError as e:
-        print(e)
-        return 0
+    except psycopg2.OperationalError as errorPost:
+        print(errorPost)
 
-def postgre(stringHost,stringUser,stringPass,stringPort,stringDB,timePostNumber,timePostLetters):
+
+def postgre(stringHost, stringUser, stringPass, stringPort, stringDB, timePostNumber, timePostLetters):
     print("Host: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
           stringPass)
     secPost = timer(int(timePostNumber), timePostLetters)
-    if (secPost == None):
+    if secPost is None:
         print("Scrie un timp corect!")
         return 0
     checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB)
@@ -175,36 +192,89 @@ def postgre(stringHost,stringUser,stringPass,stringPort,stringDB,timePostNumber,
         if msvcrt.kbhit():
             junk = getch()
             if junk:
+                print("\n\nCheckToolPostgre a fost oprit!")
                 return 0
         time.sleep(1)
         secPost -= 1
-    if (secPost == 0):
+    if secPost == 0:
         ver = stopCicle()
-        if (ver == 0):
-            print("CheckToolPostgre a fost oprit!")
+        if ver == 0:
+            print("\n\nCheckToolPostgre a fost oprit!")
         else:
-            print("CheckToolPostgre va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
-            postgre(stringHost,stringUser,stringPass,stringPort,stringDB,timePostNumber,timePostLetters)
-def postgreOne(stringHost,stringUser,stringPass,stringPort,stringDB):
-     print("Host: ",stringHost,"\nPort: ",stringPort,"\nDB: ",stringDB,"\nUser: ",stringUser,"\nPassword: ",stringPass)
-     checkPostgre(stringHost,stringUser,stringPass,stringPort,stringDB)
+            print("\n\nCheckToolPostgre va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
+            postgre(stringHost, stringUser, stringPass, stringPort, stringDB, timePostNumber, timePostLetters)
 
-#MySql
-#TIMER
+
+def postgreOne(stringHost, stringUser, stringPass, stringPort, stringDB):
+    print("Host: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
+          stringPass)
+    checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB)
+
+
+# Elastic
+
+def checkElastic(stringCloud, user, secret):
+    try:
+        es = Elasticsearch(stringCloud, http_auth=(user, secret))
+        if es.ping():
+            print("Se poate conecta!")
+        else:
+            print("Nu se poate face conexiunea!")
+    except Exception as errorElastic:
+        print(errorElastic)
+
+
+def elasticOne(stringCloud, user, secret):
+    print("Host: ", stringCloud[:-5], "\nUser: ", user, "\nSecret: ", secret, "\nPort: ", stringCloud[-4:])
+    checkElastic(stringCloud, user, secret)
+
+
+def elastic(stringCloud, user, secret, timeElasticNumber, timeElasticLetters):
+    print("Host: ", stringCloud[:-5], "\nUser: ", user, "\nSecret: ", secret, "\nPort: ", stringCloud[-4:])
+    secElastic = timer(int(timeElasticNumber), timeElasticLetters)
+    if secElastic is None:
+        print("Scrie un timp corect!")
+        return 0
+    checkElastic(stringCloud, user, secret)
+    print("Apasa orice tasta pentru a opri programul...")
+    while secElastic != 5:
+        print("Timp ramas: ", secElastic, " secunde ", end="\r")
+        if msvcrt.kbhit():
+            junk = getch()
+            if junk:
+                print("\n\nCheckToolPostgre a fost oprit!")
+                return 0
+        time.sleep(1)
+        secElastic -= 1
+        if secElastic == 0:
+            ver = stopCicle()
+            if ver == 0:
+                print("\n\nCheckToolPostgre a fost oprit!")
+            else:
+                print("\n\nCheckToolPostgre va incerca inca o conectare!Timpul stabilit a trecut!\n\n")
+                elastic(stringCloud, user, secret, timeElasticNumber, timeElasticLetters)
+
+
+# TIMER
 def seconds(numberSeconds):
     return numberSeconds
+
 
 def minutes(numberSecondsMinutes):
     return numberSecondsMinutes * 60
 
+
 def hours(numberSecondsHours):
-    return numberSecondsHours * 60 * 60;
+    return numberSecondsHours * 60 * 60
+
 
 def days(numberSecondsDays):
-    return numberSecondsDays * 60 * 60 * 24;
+    return numberSecondsDays * 60 * 60 * 24
+
 
 def months(numberSecondsDays):
-    return numberSecondsDays * 60 * 60 * 24 * 30;
+    return numberSecondsDays * 60 * 60 * 24 * 30
+
 
 def timer(number, letters):
     switcher = {
@@ -218,28 +288,30 @@ def timer(number, letters):
     try:
         func = switcher.get(letters, "Invalid month")
 
-        if (func == 1):
+        if func == 1:
             return seconds(number)
-        if (func == 2):
+        if func == 2:
             return minutes(number)
-        if (func == 3):
+        if func == 3:
             return hours(number)
-        if (func == 4):
+        if func == 4:
             return days(number)
-        if (func == 5):
+        if func == 5:
             return months(number)
-    except:
+    except Exception as errorTime:
+        print(errorTime)
         print("Incearca ceva valid ca timp!")
         return 0
 
-#BREAKER
+
+# BREAKER
 def stopCicle():
     timeout = 5
     print("Mai ai 5 secunde daca doresti sa opresti verificarea!")
     print("Apasa orice tasta...")
 
     try:
-        while (timeout != 0):
+        while timeout != 0:
             print("Timp ramas pentru oprire: ", timeout - 1, end="\r")
             timeout -= 1
             time.sleep(1)
@@ -258,7 +330,9 @@ if __name__ == "__main__":
     # args[0] = current file
     # args[1] = function name
     # args[2:] = function args : (*unpacked)
+
     try:
-     globals()[args[1]](*args[2:])
-    except:
-       helper()
+        globals()[args[1]](*args[2:])
+    except Exception as e:
+        print(e)
+        print("Scrie in consola <utility.py helper> pentru ajutor...")

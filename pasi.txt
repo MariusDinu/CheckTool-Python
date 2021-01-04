@@ -1,11 +1,19 @@
-python3 -m pip install requests  // se instaleaza in consola
+// se instaleaza in cmd
+python3 -m pip install requests
 python3 -m pip install ftplib
 python3 -m pip install pymongo
 pip3 install pymongo[srv]
 pip3 install psycopg2
+pip3 install elasticsearch
 
 
-postgres localhost Marius 123 5432 postgres (pgAdmin4)
-ftp localhost Marius 123 (FileServer)
-mongo "mongodb+srv://Marius:123@cluster0.cbmab.mongodb.net/<dbname>?retryWrites=true&w=majority" (MongoWebServer)
-python3 main.py url "https://www.datacamp.com/community/tutorials/making-http-requests-in-python" 2 // comanda pentru verificare url cu timp
+url                                            -->(site web)
+urlOne "https://www.datacamp.com/community/tutorials/making-http-requests-in-python"
+ftp                                            --> (FileServer)
+ftpOne localhost Marius 123
+mongo                                          --> (MongoWebServer)
+mongoOne "mongodb+srv://Marius:123@cluster0.cbmab.mongodb.net/<dbname>?retryWrites=true&w=majority"
+postgre                                        --> (pgAdmin4)
+postgreOne localhost Marius 123 5432 postgres
+elastic                                        -->elastic Cloud
+elastic https://2026cd03545c41c49c3405390c553928.eastus2.azure.elastic-cloud.com:9243 elastic iG8J60qJvaVOxwAHKtsD47ec
