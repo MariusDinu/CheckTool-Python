@@ -17,3 +17,7 @@ postgre                                        --> (pgAdmin4)
 postgreOne localhost Marius 123 5432 postgres
 elastic                                        -->elastic Cloud
 elastic https://2026cd03545c41c49c3405390c553928.eastus2.azure.elastic-cloud.com:9243 elastic iG8J60qJvaVOxwAHKtsD47ec
+
+Uri
+postgresql://Marius:123@localhost:5432/postgres
+ftp://Marius:123@localhost

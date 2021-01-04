@@ -1,6 +1,16 @@
 from imports import *
 
 
+"""
+Student: Dinu Marius
+Grupa: A5
+Nume Proiect(drive): Connectivity Checker
+Nume Proiect: CheckTool
+Id: 2
+Tip: B
+"""
+
+
 def helper():
     welcome = " Bun venit!\n"
     name = " Eu sunt CheckTool! Sunt un utilitar deci comenzile o sa le scrii tu...\n\n"
@@ -11,13 +21,17 @@ def helper():
     print("1. a. utility.py urlOne <link-ul> (verificare OneTime)\n")
     print("   b. utility.py url <link> <numar> <unitate timp> (verificare la durata precizata)\n\n")
     print("2. a. utility.py ftpOne <server> <user> <password> (verificare OneTime)\n")
-    print("   b. utility.py ftp <server> <user> <password> <numar> <unitate timp> (verificare la durata precizata)\n\n")
+    print("   b. utility.py ftp <server> <user> <password> <numar> <unitate timp> (verificare la durata precizata)\n")
+    print("   c. utility.py ftpUriOne <URI> (verificare OneTime) \n")
+    print("   d. utility.py ftpUri <URI> <numar> <unitate timp> (verificare la durata precizata) \n\n")
     print("3. a. utility.py mongoOne <server> (verificareOneTime)\n")
     print("   b. utility.py mongo <server> <numar> <unitate timp> (verificare la durata precizata)\n\n")
     print("4. a. utility.py postgreOne <host> <user> <password> <port> <database> (verificareOneTime)\n")
     print(
         "   b. utility.py postgre <host> <user> <password> <port> <database> <numar> <unitate timp> "
-        "(verificare la durata precizata)\n\n")
+        "(verificare la durata precizata)\n")
+    print("   c. utility.py postgreUriOne <URI> (verificareOneTime)\n")
+    print("   d. utility.py postgreUri <URI> <numar> <unitate timp> (verificare la durata precizata)\n\n")
     print("5. a. utility.py elastic <host> <user> <password> (verificareOneTime)\n")
     print(
         "   b. utility.py elastic <host> <user> <password> <numar> <unitate timo> (verificare la durata precizata)\n\n")
@@ -78,16 +92,24 @@ def checkFtp(stringFtp, stringUser, stringPassword):
     try:
         ftpObj = FTP(stringFtp, stringUser, stringPassword)
         if ftpObj.getwelcome() is not None:
+            print("\n")
             valid = "Conectarea la server se poate realiza!"
             print(valid.center(50, " "))
-
+            print("\n")
     except ConnectionError as errorFtp:
         print(errorFtp)
         print("Eroare la conectare! Serverul nu este valid!")
 
+def ftpUriOne(ftpstringUri):
+    d3 = DateFtp(ftpstringUri)
+    ftpOne(d3.host,d3.username,d3.password)
+
+def ftpUri(ftpStringUri,timeFtpNumber, timeFtpLetters):
+    d4 = DateFtp(ftpStringUri)
+    ftp(d4.host, d4.username, d4.password,timeFtpNumber, timeFtpLetters)
 
 def ftp(ftpString, user, password, timeFtpNumber, timeFtpLetters):
-    print("Nume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
+    print("\nNume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
     secFtp = timer(int(timeFtpNumber), timeFtpLetters)
     if secFtp is None:
         print("Scrie un timp corect!")
@@ -112,7 +134,7 @@ def ftp(ftpString, user, password, timeFtpNumber, timeFtpLetters):
 
 
 def ftpOne(ftpString, user, password):
-    print("Nume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
+    print("\nNume Host:", ftpString, "\nUser: ", user, "\nPassword: ", password)
     checkFtp(ftpString, user, password)
 
 
@@ -163,6 +185,8 @@ def mongoOne(stringMongo):
 
 
 # PostgreSql
+
+
 def checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB):
     try:
         conn = "host=" + stringHost \
@@ -178,8 +202,16 @@ def checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB):
         print(errorPost)
 
 
+def postgreUriOne(stringUri):
+    d1=DateConn(stringUri)
+    postgreOne(d1.host,d1.username,d1.password,d1.port,d1.path)
+
+def postgreUri(stringUri,timePostNumber,timePostLetters):
+    d2 = DateConn(stringUri)
+    postgre(d2.host, d2.username, d2.password, d2.port, d2.path,timePostNumber,timePostLetters)
+
 def postgre(stringHost, stringUser, stringPass, stringPort, stringDB, timePostNumber, timePostLetters):
-    print("Host: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
+    print("\nHost: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
           stringPass)
     secPost = timer(int(timePostNumber), timePostLetters)
     if secPost is None:
@@ -206,7 +238,7 @@ def postgre(stringHost, stringUser, stringPass, stringPort, stringDB, timePostNu
 
 
 def postgreOne(stringHost, stringUser, stringPass, stringPort, stringDB):
-    print("Host: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
+    print("\nHost: ", stringHost, "\nPort: ", stringPort, "\nDB: ", stringDB, "\nUser: ", stringUser, "\nPassword: ",
           stringPass)
     checkPostgre(stringHost, stringUser, stringPass, stringPort, stringDB)
 
@@ -330,9 +362,11 @@ if __name__ == "__main__":
     # args[0] = current file
     # args[1] = function name
     # args[2:] = function args : (*unpacked)
-
     try:
         globals()[args[1]](*args[2:])
     except Exception as e:
-        print(e)
-        print("Scrie in consola <utility.py helper> pentru ajutor...")
+        print("\n",e)
+        print("\n Scrie in consola <utility.py helper> pentru ajutor...")
+
+
+
